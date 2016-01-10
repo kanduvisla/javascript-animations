@@ -29,6 +29,18 @@ function Svg(elementId)
         line.setAttribute('stroke', '#000000');
         line.setAttribute('stroke-width', '5');
         line.setAttribute('fill', 'none');
+        this.updatePolyLine(line, coordinates);
+        element.appendChild(line);
+        return line;
+    };
+
+    /**
+     * Update coordinates of a polyline
+     * @param line
+     * @param {Array} coordinates
+     */
+    this.updatePolyLine = function(line, coordinates)
+    {
         var points = [];
         for (var index in coordinates) {
             if (coordinates.hasOwnProperty(index)) {
@@ -37,9 +49,7 @@ function Svg(elementId)
             }
         }
         line.setAttribute('points', points.join(' '));
-        element.appendChild(line);
-        return line;
-    };
+    }
 }
 
 var svgElement = new Svg('svg');
