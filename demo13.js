@@ -117,8 +117,8 @@ DirectionalCoordinates.calculateDirection = function()
                 this.coordinates[index + 1].x - this.coordinates[index].x
             );
         } else {
-            // The rotation is zero:
-            this.coordinates[index].rad = 0;
+            // The rotation is identical to the previous rotation:
+            this.coordinates[index].rad = this.coordinates[index - 1].rad;
         }
     }
 };
@@ -137,11 +137,11 @@ ExtrudedCoordinates.extrude = function(amount, taper)
     // this.reversedCoordinates = [];
     var extrudedCoordinates = [];
     var pi2 = Math.PI / 2;
-    for (var index = 0; index < count; index += 1) {
+    for (var index = count - 1; index >= 0; index -= 1) {
         var x1 = this.coordinates[index].x;
         var y1 = this.coordinates[index].y;
 
-        if (taper) {
+        if (!taper) {
             amount = originalAmount * (1 - ((index + 1) / count));
         }
 
@@ -174,7 +174,7 @@ ExtrudedCoordinates.extrude = function(amount, taper)
 };
 
 // Create rotated coordinates
-RotateCoordinates = Object.create(Coordinates);
+var RotateCoordinates = Object.create(Coordinates);
 /**
  * Rotate a shape
  * @param {float} rad
@@ -194,20 +194,34 @@ RotateCoordinates.rotate = function(rad, centerX, centerY)
     }
 };
 
+var CombinedCoordinates = Object.create(Coordinates);
+/**
+ * Create a new coordinate set that is a combination of several others
+ * @param arr
+ */
+CombinedCoordinates.combine = function(arr)
+{
+    this.coordinates = [];
+    for (var index = 0; index < arr.length; index += 1) {
+        // We need to use a little trick, because our array consist of literals:
+        for (var index2 = 0; index2 < arr[index].length; index2 += 1) {
+            this.coordinates.push(arr[index][index2]);
+        }
+    }
+    this.update();
+};
+
 // Pack it in a single object:
 var Tentacle = {
     init: function(){
         // Simple path coordinates (a line with various points)
         var line = [
-            {x:400, y:300},
             {x:450, y:300},
             {x:500, y:300},
             {x:550, y:300},
             {x:600, y:300},
             {x:650, y:300},
-            {x:700, y:300},
-            {x:750, y:300},
-            {x:800, y:300}
+            {x:700, y:300}
         ];
 
         // Create a coordinate object:
@@ -222,8 +236,6 @@ var Tentacle = {
 
         // Get the extruded coordinates (tapered):
         this.extrudedCoordinates = ExtrudedCoordinates.extrude.call(this.pathCoordinates, 40, true);
-        this.extrudedLineElement = svgElement.drawPolyline(this.extrudedCoordinates, true);
-
     },
     animate: function(elapsedMilliseconds) {
         this.pathCoordinates.reset();
@@ -234,18 +246,62 @@ var Tentacle = {
         DirectionalCoordinates.calculateDirection.call(this.pathCoordinates);
         // Update the extruded shape:
         this.extrudedCoordinates = ExtrudedCoordinates.extrude.call(this.pathCoordinates, 40, true);
-        // Update SVG:
-        svgElement.updatePolyLine(this.extrudedLineElement, this.extrudedCoordinates);
     }
 };
 
-var tentacle = Object.create(Tentacle);
-tentacle.init();
+var RotatedTentacle = Object.create(Tentacle);
+RotatedTentacle.rotation = 0;
+/**
+ * Overwrite the animate()-method to provide rotation:
+ * @param elapsedMilliseconds
+ */
+RotatedTentacle.animate = function(elapsedMilliseconds) {
+    this.pathCoordinates.reset();
+    var timeOffset = elapsedMilliseconds / (1000 / Math.PI);
+    // Update the sinus animation:
+    SinusCoordinates.setOffset.call(this.pathCoordinates, 0, 100, 0.25, timeOffset * 0, true);
+    // Rotate the original line:
+    RotateCoordinates.rotate.call(this.pathCoordinates, this.rotation, 400, 300);
+    // svgElement.drawPolyline(this.pathCoordinates.getCoordinates(), true);
+    // Update (re-calculate) the coordinate rotations:
+    DirectionalCoordinates.calculateDirection.call(this.pathCoordinates);
 
-// Let's animate it:
+    // Draw debug lines to show the direction of the points:
+    var dots = this.pathCoordinates.getCoordinates();
+    for (var i=0; i<dots.length; i++) {
+        svgElement.drawDot(dots[i], true);
+    //    dots[i].x += Math.cos(dots[i].rad) * 20;
+    //    dots[i].y += Math.sin(dots[i].rad) * 20;
+    //    svgElement.drawDot(dots[i]);
+    }
+
+
+    // Update the extruded shape:
+    this.extrudedCoordinates = ExtrudedCoordinates.extrude.call(this.pathCoordinates, 40, true);
+};
+
+// Create an array of 5 tentacles:
+var tentacles = [];
+for (var index = 0; index < 5; index += 1) {
+    tentacles[index] = Object.create(RotatedTentacle);
+    tentacles[index].rotation = index * (Math.PI / 2.5);
+    tentacles[index].init();
+}
+
+var combination = Object.create(CombinedCoordinates);
+var combinationElement = svgElement.drawPolyline(combination.getCoordinates());
+
+// Let's animate them all:
 function animate(elapsedMilliseconds)
 {
-    tentacle.animate(elapsedMilliseconds);
-    window.requestAnimationFrame(animate);
+    var coordinates = [];
+    for (var index = 0; index < 5; index += 1) {
+        tentacles[index].animate(elapsedMilliseconds * (1 + (index * 0.1)) + index * 1000);
+        coordinates.push(tentacles[index].extrudedCoordinates);
+    }
+    combination.combine(coordinates);
+    svgElement.updatePolyLine(combinationElement, combination.getCoordinates());
+
+    // window.requestAnimationFrame(animate);
 };
 animate();
