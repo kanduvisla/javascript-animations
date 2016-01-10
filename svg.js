@@ -49,7 +49,28 @@ function Svg(elementId)
             }
         }
         line.setAttribute('points', points.join(' '));
-    }
+    };
+
+    /**
+     * Draw a red dot (for debugging purposes);
+     * @param coordinates
+     */
+    this.drawDot = function(coordinates, small)
+    {
+        var dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        if (small) {
+            dot.setAttribute('fill', '#0066FF');
+            dot.setAttribute('r', '5');
+        } else {
+            dot.setAttribute('fill', '#FF0000');
+            dot.setAttribute('r', '10');
+        }
+        dot.setAttribute('stroke', 'none');
+        dot.setAttribute('cx', coordinates.x);
+        dot.setAttribute('cy', coordinates.y);
+        element.appendChild(dot);
+        return dot;
+    };
 }
 
 var svgElement = new Svg('svg');
