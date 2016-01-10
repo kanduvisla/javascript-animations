@@ -12,4 +12,4 @@ var line = [
 ];
 
 // Draw the line:
-svgElement.drawPolygon(line);
+svgElement.drawPolyline(line);

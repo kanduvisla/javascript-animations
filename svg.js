@@ -23,11 +23,12 @@ function Svg(elementId)
      * Draw a line on the HTML Element
      * @param {Array} coordinates
      */
-    this.drawPolygon = function(coordinates)
+    this.drawPolyline = function(coordinates)
     {
-        var line = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+        var line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
         line.setAttribute('stroke', '#000000');
         line.setAttribute('stroke-width', '5');
+        line.setAttribute('fill', 'none');
         var points = [];
         for (var index in coordinates) {
             if (coordinates.hasOwnProperty(index)) {
