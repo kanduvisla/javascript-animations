@@ -23,11 +23,16 @@ function Svg(elementId)
      * Draw a line on the HTML Element
      * @param {Array} coordinates
      */
-    this.drawPolyline = function(coordinates)
+    this.drawPolyline = function(coordinates, small)
     {
         var line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
-        line.setAttribute('stroke', '#000000');
-        line.setAttribute('stroke-width', '5');
+        if (small) {
+            line.setAttribute('stroke', '#FF0000');
+            line.setAttribute('stroke-width', '3');
+        } else {
+            line.setAttribute('stroke', '#000000');
+            line.setAttribute('stroke-width', '5');
+        }
         line.setAttribute('fill', 'none');
         this.updatePolyLine(line, coordinates);
         element.appendChild(line);
