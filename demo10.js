@@ -174,9 +174,27 @@ SinusCoordinates.setOffset.call(pathCoordinates, 0, 100, 0.25, 0);
 // Calculate the direction:
 DirectionalCoordinates.calculateDirection.call(pathCoordinates);
 
-// Get the extruded coordinates:
-var extrudedCoordinates = ExtrudedCoordinates.extrude.call(pathCoordinates, 40);
-var extrudedLine = svgElement.drawPolyline(extrudedCoordinates, true);
+// Get the extruded coordinates (tapered):
+var extrudedCoordinates = ExtrudedCoordinates.extrude.call(pathCoordinates, 40, true);
+var extrudedLineElement = svgElement.drawPolyline(extrudedCoordinates, true);
 
 // Draw the original line:
-svgElement.drawPolyline(pathCoordinates.getCoordinates());
+var lineElement = svgElement.drawPolyline(pathCoordinates.getCoordinates());
+
+// Let's animate it:
+function animate(elapsedMilliseconds)
+{
+    var timeOffset = elapsedMilliseconds / (1000 / Math.PI);
+    // Update the sinus animation:
+    SinusCoordinates.setOffset.call(pathCoordinates, 0, 100, 0.25, timeOffset);
+    // Update (re-calculate) the coordinate rotations:
+    DirectionalCoordinates.calculateDirection.call(pathCoordinates);
+    // Update the extruded shape:
+    extrudedCoordinates = ExtrudedCoordinates.extrude.call(pathCoordinates, 40, true);
+
+    // Update SVG:
+    svgElement.updatePolyLine(lineElement, pathCoordinates.getCoordinates());
+    svgElement.updatePolyLine(extrudedLineElement, extrudedCoordinates, true);
+    window.requestAnimationFrame(animate);
+};
+animate();

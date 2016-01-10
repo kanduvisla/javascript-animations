@@ -129,7 +129,7 @@ svgElement.drawPolyline(pathCoordinates.getCoordinates());
 var extrudedCoordinates = pathCoordinates.extrude(40);
 
 // Draw the lines:
-svgElement.drawPolyline(pathCoordinates.getCoordinates());
+// svgElement.drawPolyline(pathCoordinates.getCoordinates());
 svgElement.drawPolyline(extrudedCoordinates, true);
 
 // Draw debug lines to show the direction of the points:

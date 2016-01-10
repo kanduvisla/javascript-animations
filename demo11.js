@@ -56,9 +56,11 @@ var SinusCoordinates = Object.create(Coordinates);
  * @param {float} height
  * @param {float} offset Offset for each step
  * @param {float} time Time offset
+ * @param {boolean} taper
  */
-SinusCoordinates.setOffset = function(amount, height, offset, time)
+SinusCoordinates.setOffset = function(amount, height, offset, time, taper)
 {
+    var originalHeight = height;
     // Always use the original coordinates to departure from:
     if (this.originalCoordinates === undefined) {
         this.originalCoordinates = JSON.parse(JSON.stringify(this.coordinates));
@@ -66,11 +68,13 @@ SinusCoordinates.setOffset = function(amount, height, offset, time)
     if (!time) {
         time = 0;
     }
-    for (var index in this.coordinates) {
-        if (this.coordinates.hasOwnProperty(index)) {
-            this.coordinates[index].y = this.originalCoordinates[index].y +
-            Math.sin(amount + time + (parseInt(index) * offset) * Math.PI) * height;
+    var count = this.coordinates.length;
+    for (var index = 0; index < count; index ++) {
+        if (taper) {
+            height = originalHeight * ((index) / count);
         }
+        this.coordinates[index].y = this.originalCoordinates[index].y +
+        Math.sin(amount + time + (parseInt(index) * offset) * Math.PI) * height;
     }
 };
 
@@ -102,6 +106,7 @@ var ExtrudedCoordinates = Object.create(Coordinates);
 /**
  * Extrude the coordinates according to the amount
  * @param amount
+ * @param {boolean} taper
  */
 ExtrudedCoordinates.extrude = function(amount, taper)
 {
@@ -169,14 +174,28 @@ pathCoordinates.fill(line);
 RandomizedCoordinates.randomize.call(pathCoordinates);
 
 // Add a Sinus to it:
-SinusCoordinates.setOffset.call(pathCoordinates, 0, 100, 0.25, 0);
+SinusCoordinates.setOffset.call(pathCoordinates, 0, 100, 0.25, 0, true);
 
 // Calculate the direction:
 DirectionalCoordinates.calculateDirection.call(pathCoordinates);
 
-// Get the extruded coordinates:
-var extrudedCoordinates = ExtrudedCoordinates.extrude.call(pathCoordinates, 40);
-var extrudedLine = svgElement.drawPolyline(extrudedCoordinates, true);
+// Get the extruded coordinates (tapered):
+var extrudedCoordinates = ExtrudedCoordinates.extrude.call(pathCoordinates, 40, true);
+var extrudedLineElement = svgElement.drawPolyline(extrudedCoordinates, true);
 
-// Draw the original line:
-svgElement.drawPolyline(pathCoordinates.getCoordinates());
+// Let's animate it:
+function animate(elapsedMilliseconds)
+{
+    var timeOffset = elapsedMilliseconds / (1000 / Math.PI);
+    // Update the sinus animation:
+    SinusCoordinates.setOffset.call(pathCoordinates, 0, 100, 0.25, timeOffset, true);
+    // Update (re-calculate) the coordinate rotations:
+    DirectionalCoordinates.calculateDirection.call(pathCoordinates);
+    // Update the extruded shape:
+    extrudedCoordinates = ExtrudedCoordinates.extrude.call(pathCoordinates, 40, true);
+
+    // Update SVG:
+    svgElement.updatePolyLine(extrudedLineElement, extrudedCoordinates, true);
+    window.requestAnimationFrame(animate);
+};
+animate();
