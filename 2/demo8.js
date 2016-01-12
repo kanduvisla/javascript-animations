@@ -53,8 +53,8 @@ Coordinates.setSinus = function(args) {
     // Extra parameters:
     var sinIdxMultiplier = args.sinIdxMultiplier ? args.sinIdxMultiplier : 0;
     var cosIdxMultiplier = args.cosIdxMultiplier ? args.cosIdxMultiplier : 0;
-    var sinIdxAddition = 0;
-    var cosIdxAddition = 0;
+    var sinIdxAddition = args.sinIdxAddition ? args.sinIdxAddition : 0;
+    var cosIdxAddition = args.cosIdxAddition ? args.cosIdxAddition : 0;
     // Do the magic:
     for (var index = 0; index < this.length; index += 1) {
         this.coordinates[index].y += Math.sin(sinRad + (index + sinIdxAddition) * sinIdxMultiplier) * amount;

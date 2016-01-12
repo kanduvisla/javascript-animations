@@ -55,10 +55,14 @@ Coordinates.setSinus = function(args) {
     var cosIdxMultiplier = args.cosIdxMultiplier ? args.cosIdxMultiplier : 0;
     var sinIdxAddition = args.sinIdxAddition ? args.sinIdxAddition : 0;
     var cosIdxAddition = args.cosIdxAddition ? args.cosIdxAddition : 0;
+    var sinIdxOffset = args.sinIdxOffset ? args.sinIdxOffset : 0;
+    var cosIdxOffset = args.cosIdxOffset ? args.cosIdxOffset : 0;
     // Do the magic:
     for (var index = 0; index < this.length; index += 1) {
-        this.coordinates[index].y += Math.sin(sinRad + (index + sinIdxAddition) * sinIdxMultiplier) * amount;
-        this.coordinates[index].x += Math.cos(cosRad + (index + cosIdxAddition) * cosIdxMultiplier) * amount;
+        this.coordinates[index].y +=
+            Math.sin(sinRad + (sinIdxOffset * index) + (index + sinIdxAddition) * sinIdxMultiplier) * amount;
+        this.coordinates[index].x +=
+            Math.cos(cosRad + (cosIdxOffset * index) + (index + cosIdxAddition) * cosIdxMultiplier) * amount;
     }
     return this;
 };
@@ -87,31 +91,15 @@ Coordinates.calculateDirection = function() {
 var myCoordinates = Object.create(Coordinates);
 var coordinates = myCoordinates
     .setCoordinates([
-        {x:0, y:300},
-        {x:50, y:300},
-        {x:100, y:300},
-        {x:150, y:300},
-        {x:200, y:300},
-        {x:250, y:300},
-        {x:300, y:300},
-        {x:350, y:300},
         {x:400, y:300},
-        {x:450, y:300},
-        {x:500, y:300},
-        {x:550, y:300},
-        {x:600, y:300},
-        {x:650, y:300},
-        {x:700, y:300},
-        {x:750, y:300}
+        {x:400, y:300}
     ])
     .getCoordinates();
 
 // Draw multiple dots, for debugging purposes:
 var dots = [];
-var directionDots = [];
 for (var index = 0; index < coordinates.length; index += 1) {
     dots.push(svgElement.drawDot(coordinates[index]))
-    directionDots.push(svgElement.drawDot(coordinates[index], true));
 }
 
 /**
@@ -123,15 +111,17 @@ function animate(elapsedMilliseconds) {
     var pi = elapsedMilliseconds / (1000 / Math.PI);
     coordinates = myCoordinates
         .reset()
-        .setSinus({sinRad: pi, sinIdxMultiplier: 0.5, amount: 50})
+        .setSinus({
+            sinRad: pi / 2,
+            cosRad: pi / 2,
+            amount: 200,
+            sinIdxOffset: Math.PI,
+            cosIdxOffset: Math.PI
+        })
         .calculateDirection()
         .getCoordinates();
     for (var index = 0; index < coordinates.length; index += 1) {
         svgElement.updateDot(dots[index], coordinates[index]);
-        // Show the direction dots:
-        coordinates[index].y += Math.sin(coordinates[index].rad) * 15;
-        coordinates[index].x += Math.cos(coordinates[index].rad) * 15;
-        svgElement.updateDot(directionDots[index], coordinates[index]);
     }
     window.requestAnimationFrame(animate);
 }
