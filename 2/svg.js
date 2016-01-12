@@ -71,11 +71,21 @@ function Svg(elementId)
             dot.setAttribute('r', '10');
         }
         dot.setAttribute('stroke', 'none');
-        dot.setAttribute('cx', coordinates.x);
-        dot.setAttribute('cy', coordinates.y);
+        this.updateDot(dot, coordinates);
         element.appendChild(dot);
         return dot;
     };
+
+    /**
+     * Update a dot
+     * @param dot
+     * @param coordinates
+     */
+    this.updateDot = function(dot, coordinates)
+    {
+        dot.setAttribute('cx', coordinates.x);
+        dot.setAttribute('cy', coordinates.y);
+    }
 }
 
 var svgElement = new Svg('svg');
