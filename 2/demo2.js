@@ -7,6 +7,7 @@
  */
 var Coordinates = {
     coordinates: [],
+    length: 0,
 
     /**
      * Set coordinates
@@ -14,7 +15,9 @@ var Coordinates = {
      * @returns {Coordinates}
      */
     setCoordinates: function (coords) {
-        this.coordinates = coords;
+        // We need to use a little trick, because our array consist of literals:
+        this.coordinates = JSON.parse(JSON.stringify(coords));
+        this.length = this.coordinates.length;
         return this;
     },
 
@@ -31,13 +34,10 @@ var Coordinates = {
  * Simple randomizer
  * @returns {Coordinates}
  */
-Coordinates.randomize = function()
-{
-    for (var index in this.coordinates) {
-        if (this.coordinates.hasOwnProperty(index)) {
-            this.coordinates[index].x += (Math.random() * 40) - 20;
-            this.coordinates[index].y += (Math.random() * 40) - 20;
-        }
+Coordinates.randomize = function() {
+    for (var index = 0; index < this.length; index += 1) {
+        this.coordinates[index].x += (Math.random() * 40) - 20;
+        this.coordinates[index].y += (Math.random() * 40) - 20;
     }
     return this;
 };
