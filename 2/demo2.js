@@ -42,8 +42,12 @@ Coordinates.randomize = function()
     return this;
 };
 
+// Create coordinates with chaining:
 var myCoordinates = Object.create(Coordinates);
 var coordinates = myCoordinates
     .setCoordinates([{x:400, y:300}])
     .randomize()
     .getCoordinates();
+
+// Draw a dot, for debugging purposes:
+svgElement.drawDot(coordinates[0]);
