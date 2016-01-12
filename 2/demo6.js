@@ -56,11 +56,31 @@ Coordinates.setSinus = function(sinRad, cosRad, amount) {
 // Create coordinates with chaining:
 var myCoordinates = Object.create(Coordinates);
 var coordinates = myCoordinates
-    .setCoordinates([{x:400, y:300}])
+    .setCoordinates([
+        {x:0, y:300},
+        {x:50, y:300},
+        {x:100, y:300},
+        {x:150, y:300},
+        {x:200, y:300},
+        {x:250, y:300},
+        {x:300, y:300},
+        {x:350, y:300},
+        {x:400, y:300},
+        {x:450, y:300},
+        {x:500, y:300},
+        {x:550, y:300},
+        {x:600, y:300},
+        {x:650, y:300},
+        {x:700, y:300},
+        {x:750, y:300}
+    ])
     .getCoordinates();
 
-// Draw a dot, for debugging purposes:
-var dot = svgElement.drawDot(coordinates[0]);
+// Draw multiple dots, for debugging purposes:
+var dots = [];
+for (var index = 0; index < coordinates.length; index += 1) {
+    dots.push(svgElement.drawDot(coordinates[index]))
+}
 
 /**
  * Animation function
@@ -71,9 +91,11 @@ function animate(elapsedMilliseconds) {
     var pi = elapsedMilliseconds / (1000 / Math.PI);
     coordinates = myCoordinates
         .reset()
-        .setSinus(0, pi, 100)
+        .setSinus(pi, Math.PI / 2, 100)
         .getCoordinates();
-    svgElement.updateDot(dot, coordinates[0]);
+    for (var index = 0; index < coordinates.length; index += 1) {
+        svgElement.updateDot(dots[index], coordinates[index]);
+    }
     window.requestAnimationFrame(animate);
 }
 animate(0);

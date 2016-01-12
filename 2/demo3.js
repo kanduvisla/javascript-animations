@@ -29,6 +29,15 @@ var Coordinates = {
      */
     getCoordinates: function() {
         return this.coordinates;
+    },
+
+    /**
+     * Reset the coordinates to their original coordinates
+     * @returns {Coordinates}
+     */
+    reset: function() {
+        this.coordinates = JSON.parse(JSON.stringify(this.originalCoordinates));
+        return this;
     }
 };
 
@@ -38,8 +47,8 @@ var Coordinates = {
  */
 Coordinates.setSinus = function(sinRad, cosRad, amount) {
     for (var index = 0; index < this.length; index += 1) {
-        this.coordinates[index].y = this.originalCoordinates[index].y + Math.sin(sinRad) * amount;
-        this.coordinates[index].x = this.originalCoordinates[index].x + Math.cos(cosRad) * amount;
+        this.coordinates[index].y += Math.sin(sinRad) * amount;
+        this.coordinates[index].x += Math.cos(cosRad) * amount;
     }
     return this;
 };

@@ -71,7 +71,7 @@ function animate(elapsedMilliseconds) {
     var pi = elapsedMilliseconds / (1000 / Math.PI);
     coordinates = myCoordinates
         .reset()
-        .setSinus(0, pi, 100)
+        .setSinus(pi, pi, 100)
         .getCoordinates();
     svgElement.updateDot(dot, coordinates[0]);
     window.requestAnimationFrame(animate);
