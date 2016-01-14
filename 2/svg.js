@@ -85,6 +85,32 @@ function Svg(elementId)
     {
         dot.setAttribute('cx', coordinates.x);
         dot.setAttribute('cy', coordinates.y);
+    };
+
+    /**
+     * Draw a circle
+     * @param coordinates
+     * @param options
+     * @returns {HTMLElement}
+     */
+    this.drawCircle = function(coordinates, options)
+    {
+        var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        this.updateCircle(circle, options);
+        element.appendChild(circle);
+        return circle;
+    };
+
+    /**
+     * Update a circle
+     */
+    this.updateCircle = function(circle, options)
+    {
+        for (var key in options) {
+            if (options.hasOwnProperty(key)) {
+                circle.setAttribute(key, options[key]);
+            }
+        }
     }
 }
 

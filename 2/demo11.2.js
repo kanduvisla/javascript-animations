@@ -140,7 +140,7 @@ function animate(elapsedMilliseconds) {
             {
                 cx : coordinates[index].x,
                 cy : coordinates[index].y,
-                r : (Math.sin(pi) + 1.5) * 10
+                r : (Math.sin(pi + index) + 1.5) * 10
             }
         );
     }

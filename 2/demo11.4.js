@@ -95,7 +95,7 @@ Coordinates.lookAtMouse = function() {
 var coordinatesArray = [];
 for (var y=0; y<=600; y+= 50) {
     for (var x=0; x<=800; x+= 50) {
-        coordinatesArray.push({x:x, y:y});
+        coordinatesArray.push({x:x, y:y, multiplier:Math.random() + 0.5});
     }
 }
 
@@ -112,17 +112,15 @@ for (var index = 0; index < coordinates.length; index += 1) {
         svgElement.drawCircle(
             coordinates[index],
             {
-                stroke:'none',
-                fill:'#c88',
-                r:25,
-                cx:coordinates[index].x,
-                cy:coordinates[index].y
+                stroke : 'none',
+                fill : '#c88',
+                r : 25,
+                cx : coordinates[index].x,
+                cy : coordinates[index].y
             }
         )
     );
 }
-
-var randomMultiplier = Math.random() * 100;
 
 /**
  * Animation function
@@ -140,7 +138,7 @@ function animate(elapsedMilliseconds) {
             {
                 cx : coordinates[index].x,
                 cy : coordinates[index].y,
-                r : (Math.sin(pi) + 1.5) * 10
+                r : (Math.sin(pi * coordinates[index].multiplier) + 1.5) * 10
             }
         );
     }

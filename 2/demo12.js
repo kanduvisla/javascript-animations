@@ -87,16 +87,17 @@ Coordinates.calculateDirection = function() {
     return this;
 };
 
-Coordinates.lookAtMouse = function() {
-    // Get mouse position:
-};
-
 // Create coordinate map:
 var coordinatesArray = [];
-for (var y=0; y<=600; y+= 50) {
-    for (var x=0; x<=800; x+= 50) {
-        coordinatesArray.push({x:x, y:y});
-    }
+var circleCount = 20;
+for (var i=0; i<circleCount; i+= 1) {
+    coordinatesArray.push(
+        {
+            x : 200 + Math.random() * 400,
+            y : 250 + Math.random() * 100,
+            multiplier : Math.random() + 0.5
+        }
+    );
 }
 
 // Create coordinates with chaining:
@@ -106,14 +107,29 @@ var coordinates = myCoordinates
     .getCoordinates();
 
 // Draw multiple dots, for debugging purposes:
-var dots = [];
-for (var index = 0; index < coordinates.length; index += 1) {
-    dots.push(
+var circles = [];
+var index;
+for (index = 0; index < coordinates.length; index += 1) {
+    circles.push(
         svgElement.drawCircle(
             coordinates[index],
             {
                 stroke:'none',
                 fill:'#c88',
+                r:50,
+                cx:coordinates[index].x,
+                cy:coordinates[index].y
+            }
+        )
+    );
+}
+for (index = 0; index < coordinates.length; index += 1) {
+    circles.push(
+        svgElement.drawCircle(
+            coordinates[index],
+            {
+                stroke:'none',
+                fill:'#faa',
                 r:25,
                 cx:coordinates[index].x,
                 cy:coordinates[index].y
@@ -121,8 +137,6 @@ for (var index = 0; index < coordinates.length; index += 1) {
         )
     );
 }
-
-var randomMultiplier = Math.random() * 100;
 
 /**
  * Animation function
@@ -133,14 +147,31 @@ function animate(elapsedMilliseconds) {
     var pi = elapsedMilliseconds / (1000 / Math.PI);
     coordinates = myCoordinates
         .reset()
+        .setSinus({
+            sinRad: pi/2,
+            cosRad: pi/2,
+            sinIdxAddition: 1,
+            cosIdxAddition: 1,
+            sinIdxMultiplier: 1.1,
+            cosIdxMultiplier: -1.1,
+            amount: 50
+        })
         .getCoordinates();
     for (var index = 0; index < coordinates.length; index += 1) {
         svgElement.updateCircle(
-            dots[index],
+            circles[index],
             {
                 cx : coordinates[index].x,
                 cy : coordinates[index].y,
-                r : (Math.sin(pi) + 1.5) * 10
+                r : (Math.sin(pi * coordinates[index].multiplier) + 1.5) * 50
+            }
+        );
+        svgElement.updateCircle(
+            circles[index + circleCount],
+            {
+                cx : coordinates[index].x,
+                cy : coordinates[index].y,
+                r : (Math.sin(pi * coordinates[index].multiplier) + 1.5) * 25
             }
         );
     }

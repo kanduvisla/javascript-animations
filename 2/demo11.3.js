@@ -112,11 +112,11 @@ for (var index = 0; index < coordinates.length; index += 1) {
         svgElement.drawCircle(
             coordinates[index],
             {
-                stroke:'none',
-                fill:'#c88',
-                r:25,
-                cx:coordinates[index].x,
-                cy:coordinates[index].y
+                stroke : 'none',
+                fill : '#c88',
+                r : 25,
+                cx : coordinates[index].x,
+                cy : coordinates[index].y
             }
         )
     );
@@ -140,7 +140,7 @@ function animate(elapsedMilliseconds) {
             {
                 cx : coordinates[index].x,
                 cy : coordinates[index].y,
-                r : (Math.sin(pi) + 1.5) * 10
+                r : (Math.sin(pi + index * index / 1.4142423) + 1.5) * 10
             }
         );
     }
